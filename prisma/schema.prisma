@@ -1,0 +1,153 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  name          String
+  role          Role
+  password      String
+  contactNumber String
+  address       String
+  profileImg    String
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  Booking       Booking[]
+  Reviews       Reviews[]
+
+  @@map("users")
+}
+
+enum Role {
+  admin
+  user
+  super_admin
+}
+
+model Categories {
+  id        String     @id @default(uuid())
+  title     String
+  imageLink String
+  status    Boolean    @default(false)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  services  Services[]
+
+  @@map("categories")
+}
+
+model Services {
+  id          String     @id @default(uuid())
+  title       String
+  description String
+  price       String
+  tax         String
+  categoryId  String
+  location    Location
+  category    Categories @relation(fields: [categoryId], references: [id])
+  imageLink   String
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  booking     Booking[]
+  reviews     Reviews[]
+
+  @@map("services")
+}
+
+enum Location {
+  Narail
+  Khulna
+  Kalia
+  Banani
+  Dhanmondi
+  Mohammadpur
+  Motijheel
+  Khilgaon
+  Shyamoli
+  Farmgate
+  Mohakhali
+  Tejgaon
+  Rampura
+  Badda
+  Malibagh
+  Jatrabari
+  Demra
+  Kadamtali
+  Keraniganj
+}
+
+model Reviews {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  serviceId String
+  service   Services @relation(fields: [serviceId], references: [id])
+  review    String
+  rating    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("reviews")
+}
+
+model Booking {
+  id        String        @id @default(uuid())
+  date      String
+  startTime String
+  endTime   String
+  userId    String
+  user      User          @relation(fields: [userId], references: [id])
+  serviceId String
+  service   Services      @relation(fields: [serviceId], references: [id])
+  status    BookingStatus
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@map("bookings")
+}
+
+enum BookingStatus {
+  pending
+  accepted
+  rejected
+}
+
+model Blog {
+  id        String   @id @default(uuid())
+  title     String
+  content   String
+  imageLink String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("blog")
+}
+
+model Faqs {
+  id        String   @id @default(uuid())
+  question  String
+  answer    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("faqs")
+}
+
+model Feedback {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  message   String
+  createdAt DateTime @default(now())
+
+  @@map("feedback")
+}
